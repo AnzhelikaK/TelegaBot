@@ -75,7 +75,7 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         return "1026166360:AAF4b_WcSGo1xZE5yfz2afN7mZ2xcFBuPZAA";
-    } // убрать последнюю А
+    }
 
     public void sendMsg(Message message, String text) {
         SendMessage sendMessage = new SendMessage();
