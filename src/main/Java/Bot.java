@@ -21,7 +21,7 @@ public class Bot extends TelegramLongPollingBot {
         ApiContextInitializer.init(); // инициализация API
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
-            telegramBotsApi.registerBot(new Bot());  // регистрация бота
+            telegramBotsApi.registerBot(new Bot());  // регистрация ботаa
         } catch (TelegramApiRequestException e) {
             e.printStackTrace();
         }
@@ -34,12 +34,8 @@ public class Bot extends TelegramLongPollingBot {
         Message message = update.getMessage();
         if (message != null && message.hasText()) {
             System.out.println(message.getText());
-            System.out.println(message.getText().substring(0,3));
-            System.out.println(message.getText());
-            System.out.println(message.getText().substring(0,3).equals("/W-"));
-            if (message.getText().substring(0,3).equalsIgnoreCase("/W-")) {
+            if (message.getText().contains("/W-") || message.getText().contains("/w-")) {
                 Weather.setCityName(message.getText().trim().substring(3));
-                System.out.println(Weather.getCityName());
                 try {
                     sendMsg(message, Weather.getWeather(model));
                 } catch (IOException e) {
@@ -63,8 +59,8 @@ public class Bot extends TelegramLongPollingBot {
                     default:
                         sendMsg(message, "I don't understand you / This city is not found");
                 }
-            }
         }
+    }
 
 
     @Override
@@ -74,8 +70,8 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public String getBotToken() {
-        return "1026166360:AAF4b_WcSGo1xZE5yfz2afN7mZ2xcFBuPZAA";
-    }
+        return "1026166360:AAF4b_WcSGo1xZE5yfz2afN7mZ2xcFBuPZA";
+    } // убрать последнюю А
 
     public void sendMsg(Message message, String text) {
         SendMessage sendMessage = new SendMessage();
