@@ -22,7 +22,7 @@ public class Bot extends TelegramLongPollingBot {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
             telegramBotsApi.registerBot(new Bot());  // регистрация ботаa
-        } catch (TelegramApiRequestException e) {
+        } catch (TelegramApiRequestException e) {  // commit 2
             e.printStackTrace();
         }
     }
