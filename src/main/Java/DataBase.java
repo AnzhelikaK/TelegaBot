@@ -8,7 +8,7 @@ public class DataBase {
     Connection connection;
 
 
-    // ???? throws ClassNotFoundException {   // SQLException   в методе где создается БД были эти ошибки
+   
 public void getConnectDB(){ // throws CSQLException
     try {
         connection = DriverManager.getConnection(connectionUrl, userName, password);
