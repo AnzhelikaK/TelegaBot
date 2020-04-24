@@ -1,16 +1,16 @@
 public class Model {
-    private String name;
+    private String nameOfCity;
     private Double temp;
     private Double humidity;
     private String icon;
-    private String main;
+    private String description;
 
-    public String getName() {
-        return name;
+    public String getNameOfCity() {
+        return nameOfCity;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNameOfCity(String nameOfCity) {
+        this.nameOfCity = nameOfCity;
     }
 
     public Double getTemp() {
@@ -37,11 +37,11 @@ public class Model {
         this.icon = icon;
     }
 
-    public String getMain() {
-        return main;
+    public String getDescription() {
+        return description;
     }
 
-    public void setMain(String main) {
-        this.main = main;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

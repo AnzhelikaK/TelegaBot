@@ -1,4 +1,3 @@
-import com.fasterxml.jackson.databind.util.ISO8601Utils;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -21,23 +20,31 @@ public class Bot extends TelegramLongPollingBot {
         ApiContextInitializer.init(); // инициализация API
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
-            telegramBotsApi.registerBot(new Bot());  // регистрация ботаa
-        } catch (TelegramApiRequestException e) {  // commit 2
+            telegramBotsApi.registerBot(new Bot());  // регистрация бота
+        } catch (TelegramApiRequestException e) {
             e.printStackTrace();
         }
+        }
+    @Override
+    public String getBotUsername() {
+        return "KryvapustBot";
     }
 
-
     @Override
+    public String getBotToken() {
+        return "____";
+    }
+
+   @Override
     public void onUpdateReceived(Update update) {
-        Model model = new Model();
-        Message message = update.getMessage();
+       Message message = update.getMessage();
+  //     System.out.println(message);
         if (message != null && message.hasText()) {
-            System.out.println(message.getText());
-            if (message.getText().contains("/W-") || message.getText().contains("/w-")) {
-                Weather.setCityName(message.getText().trim().substring(3));
+  //         System.out.println(message.getText());      // message.getText() - то что вводилось в сообщении
+            if (message.getText().contains("W-") || message.getText().contains("w-")) {
+                Weather weather = new Weather(message.getText().trim().substring(2));  // передаем Название города в конструктор
                 try {
-                    sendMsg(message, Weather.getWeather(model));
+                    sendMsg(message, weather.getWeather());
                 } catch (IOException e) {
                     sendMsg(message, "City is not found");
                 }
@@ -54,7 +61,7 @@ public class Bot extends TelegramLongPollingBot {
                         sendMsg(message, "It is main menu. What do you want?");
                         break;
                     case "/weather":
-                        sendMsg(message, "Write City as: /W-City (For example: /W-Minsk");
+                        sendMsg(message, "Write City as: W-City (For example: W-Minsk");
                         break;
                     default:
                         sendMsg(message, "I don't understand you / This city is not found");
@@ -62,27 +69,15 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-
-    @Override
-    public String getBotUsername() {
-        return "KryvapustBot";
-    }
-
-    @Override
-    public String getBotToken() {
-        return "1026166360:AAF4b_WcSGo1xZE5yfz2afN7mZ2xcFBuPZA";
-    } // убрать последнюю А
-
     public void sendMsg(Message message, String text) {
         SendMessage sendMessage = new SendMessage();
-        sendMessage.enableMarkdown(true);   // возможность разметки
-        sendMessage.setChatId(message.getChatId().toString()); //определяем какой чат и устанавливаем его в отправляемое сообщение
-        sendMessage.setReplyToMessageId(message.getMessageId()); // определяем на какой сообщение должны ответить
+        sendMessage.enableMarkdown(true);                          // возможность разметки
+        sendMessage.setChatId(message.getChatId().toString());     // определяем какой чат и устанавливаем его в отправляемое сообщение
+        sendMessage.setReplyToMessageId(message.getMessageId());   // определяем на какой сообщение должны ответить
         sendMessage.setText(text);
         setButtons(sendMessage);
         // непосредственная отправка сообщения
         try {
-
             sendMessage(sendMessage);  // зачеркнуто, так как метод устаревший, но он работает
         } catch (TelegramApiException e) {
             e.printStackTrace();
@@ -92,14 +87,14 @@ public class Bot extends TelegramLongPollingBot {
     // метод для выводв клавиатуры
     public void setButtons(SendMessage sendMessage) {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(); // создание клавиатуры
-        sendMessage.setReplyMarkup(replyKeyboardMarkup); // разметка для клавиатуры - связываем сообщение с клавиатурой
-        replyKeyboardMarkup.setSelective(true); // показывать клавиатуру всем полльзователям
-        replyKeyboardMarkup.setResizeKeyboard(true); // подгонять размер клавиатуры под количество кнопок
-        replyKeyboardMarkup.setOneTimeKeyboard(true); // скрывать клавиатуру после нажития или нет
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);     // разметка для клавиатуры - связываем сообщение с клавиатурой
+        replyKeyboardMarkup.setSelective(true);              // показывать клавиатуру всем полльзователям
+        replyKeyboardMarkup.setResizeKeyboard(true);         // подгонять размер клавиатуры под количество кнопок
+        replyKeyboardMarkup.setOneTimeKeyboard(true);        // скрывать клавиатуру после нажития или нет
 
-
-// Первая строчка клавиатуры
+//      Создаем лист строчек для клавиатуры
         List<KeyboardRow> keyboardRowList = new ArrayList<>();
+        // Первая строчка клавиатуры
         KeyboardRow keyboardFirstRow = new KeyboardRow();
         // создание кнопок для клавиатуры
         keyboardFirstRow.add(new KeyboardButton("/start"));
@@ -108,7 +103,10 @@ public class Bot extends TelegramLongPollingBot {
 
 // Вторая строчка клавиатуры
         KeyboardRow keyboardSecondRow = new KeyboardRow();
+        // создание кнопок для клавиатуры
         keyboardSecondRow.add(new KeyboardButton("/weather"));
+        keyboardSecondRow.add(new KeyboardButton("w-Minsk"));
+        keyboardSecondRow.add(new KeyboardButton("w-Polatsk"));
 
 
 // Добавление строчек в клавиатуру
