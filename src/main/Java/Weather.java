@@ -1,4 +1,3 @@
-import com.fasterxml.jackson.databind.util.ISO8601Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -7,60 +6,57 @@ import java.net.URL;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 
 public class Weather {
     private Model model;
-    private LocalDate date=LocalDate.now();
-    private Date dateForDB=Date.valueOf(date);;
+    private Supplier<LocalDate> s = LocalDate::now;  // ради использование функционального интерфейса
+    private LocalDate date = s.get();
+    private Date dateForDB = Date.valueOf(date);
 
-        public Weather(String nameOfCity) {
+
+    public Weather(String nameOfCity) {
         this.model = new Model();
-        model.setNameOfCity(nameOfCity);
-            System.out.println(date);
-            System.out.println(dateForDB);
+        model.setNameOfCity(nameOfCity.toLowerCase());
     }
-    /*private String cityName;
-    private LocalDateTime date;
-    private double temp;
-    private double humidity;
-    private String icon;
-    private String description;*/
-
-//    public void setCityName(String cityName) {
-//        this.cityName = cityName;
-//    }
-//
-//    public String getCityName() {
-//        return cityName;
-//    }
 
     public String getWeather() throws IOException {
-        URL url = new URL("http://api.openweathermap.org/data/2.5/weather?q=" + model.getNameOfCity() + "&units=metric&appid=fe982945678dccb35c624850b3029e0f");
 
-        // вариант 1 получения json в виде String
-        Reader reader = new InputStreamReader((InputStream) url.getContent());
-        BufferedReader br = new BufferedReader(reader);
-        Stream<String> lines = br.lines();
-        StringBuilder result = lines.collect(StringBuilder::new, StringBuilder::append, StringBuilder::append);
+        if (!checkDateInDB(model, dateForDB)) {
+            System.out.println("зашли получать ответ с сайта для " + model.getNameOfCity());
+            URL url = new URL("http://api.openweathermap.org/data/2.5/weather?q=" + model.getNameOfCity() + "&units=metric&appid=fe982945678dccb35c624850b3029e0f");
 
-        // вариант 2 получения json в виде String
+            // вариант 1 получения json в виде String
+            Reader reader = new InputStreamReader((InputStream) url.getContent());
+            BufferedReader br = new BufferedReader(reader);
+            Stream<String> lines = br.lines();
+            StringBuilder result = lines.collect(StringBuilder::new, StringBuilder::append, StringBuilder::append);   // or 1
+            //     String result = lines.reduce("", (r,c)->r+c);           // or 2
+
+            // вариант 2 получения json в виде String
+
 /*
-        Scanner in = new Scanner((InputStream) url.getContent());  // сканер, который может анализировать строки. ему скармливаем строку
+        Scanner in = new Scanner((InputStream) url.getContent());  // сканер, который может анализировать строки.
         String result = "";
         while (in.hasNext()) result += in.nextLine();
 */
-        workWithJson(result.toString());
-        workWithDB();
-
+            workWithJson(result.toString());
+            writeDateInDB();
+        } else System.out.println("Ответ был из БД получен для " + model.getNameOfCity());
         return "City: " + model.getNameOfCity() + "\n"
                 + "Temperature: " + model.getTemp() + " C" + '\u00B0' + "\n" +
                 "Humidity: " + model.getHumidity() + " %" + "\n" + "Description: " + model.getDescription() + "\n" +
                 "http://openweathermap.org/img/wn/" + model.getIcon() + "@2x.png";
     }
 
+
+    private boolean checkDateInDB(Model model, Date dateForDB) {
+        DataBase db = new DataBase();
+        db.getConnectDB();
+        return db.answerOfDB(model, dateForDB);
+    }
 
     private void workWithJson(String result) {
         JSONObject object = new JSONObject(result);               // создали json объект из всей строчки
@@ -76,7 +72,7 @@ public class Weather {
         }
     }
 
-    private void workWithDB() {
+    private void writeDateInDB() {
         DataBase db = new DataBase();
         db.getConnectDB();
         db.writeInDB(model, dateForDB);

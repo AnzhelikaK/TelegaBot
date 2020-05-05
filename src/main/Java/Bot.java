@@ -17,6 +17,13 @@ import java.util.List;
 public class Bot extends TelegramLongPollingBot {
 
     public static void main(String[] args) {
+        // Для тестирования работы с датой
+/*        TestDate td=new TestDate();
+        td.go();
+        DataBase df=new DataBase();
+        df.getConnectDB(); */
+
+
         ApiContextInitializer.init(); // инициализация API
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
@@ -24,7 +31,8 @@ public class Bot extends TelegramLongPollingBot {
         } catch (TelegramApiRequestException e) {
             e.printStackTrace();
         }
-        }
+    }
+
     @Override
     public String getBotUsername() {
         return "KryvapustBot";
@@ -32,15 +40,15 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public String getBotToken() {
-        return "____";
+        return "1026166360:AAF4b_WcSGo1xZE5yfz2afN7mZ2xcFBuPZA";
     }
 
-   @Override
+    @Override
     public void onUpdateReceived(Update update) {
-       Message message = update.getMessage();
-  //     System.out.println(message);
+        Message message = update.getMessage();
+        //     System.out.println(message);
         if (message != null && message.hasText()) {
-  //         System.out.println(message.getText());      // message.getText() - то что вводилось в сообщении
+            //         System.out.println(message.getText());      // message.getText() - то что вводилось в сообщении
             if (message.getText().contains("W-") || message.getText().contains("w-")) {
                 Weather weather = new Weather(message.getText().trim().substring(2));  // передаем Название города в конструктор
                 try {
