@@ -3,4 +3,4 @@
 *.jar
 *.war
 *.ear
-*.TestDate.java
+*\TestDate.java
