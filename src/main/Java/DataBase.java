@@ -9,6 +9,7 @@ public class DataBase {
     String connectionUrl = "jdbc:mysql://localhost:3306/fortelegabot?useUnicode=true&serverTimezone=Europe/Minsk"; //&serverTimezone=UTC
     Connection connection;
 
+<<<<<<< HEAD
     // ???? throws ClassNotFoundException {   // SQLException   в методе где создается БД были эти ошибки
     public void getConnectDB() { // throws CSQLException
         try {
@@ -16,6 +17,15 @@ public class DataBase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+=======
+
+   
+public void getConnectDB(){ // throws CSQLException
+    try {
+        connection = DriverManager.getConnection(connectionUrl, userName, password);
+    } catch (SQLException e) {
+        e.printStackTrace();
+>>>>>>> fcf5fe75c23815b045dbc6dcadc99e6a68ef193c
     }
 
     public void writeInDB(Model model, Date dateForDB) {
