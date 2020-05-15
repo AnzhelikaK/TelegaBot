@@ -1,16 +1,31 @@
-public class Model {
-    private String nameOfCity;
+package DAO;
+
+
+import java.sql.Date;
+
+public class WeatherModel {
+    private Integer id;
+    private String name;
+    private Date date;
     private Double temp;
     private Double humidity;
     private String icon;
     private String description;
 
-    public String getNameOfCity() {
-        return nameOfCity;
+    public Integer getId() {
+        return id;
     }
 
-    public void setNameOfCity(String nameOfCity) {
-        this.nameOfCity = nameOfCity;
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Double getTemp() {
@@ -43,5 +58,13 @@ public class Model {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

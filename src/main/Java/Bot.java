@@ -1,3 +1,4 @@
+import Service.WeatherService;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -17,12 +18,6 @@ import java.util.List;
 public class Bot extends TelegramLongPollingBot {
 
     public static void main(String[] args) {
-        // Для тестирования работы с датой
-/*        TestDate td=new TestDate();
-        td.go();
-        DataBase df=new DataBase();
-        df.getConnectDB(); */
-
 
         ApiContextInitializer.init(); // инициализация API
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
@@ -46,11 +41,12 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
-        //     System.out.println(message);
+
         if (message != null && message.hasText()) {
-            //         System.out.println(message.getText());      // message.getText() - то что вводилось в сообщении
-            if (message.getText().contains("W-") || message.getText().contains("w-")) {
-                Weather weather = new Weather(message.getText().trim().substring(2));  // передаем Название города в конструктор
+            String request=message.getText().trim().toLowerCase();
+
+            if (request.contains("w") && request.contains("-")) {
+                WeatherService weather = new WeatherService(Help.getCity(request));  // передаем Название города в конструктор
                 try {
                     sendMsg(message, weather.getWeather());
                 } catch (IOException e) {

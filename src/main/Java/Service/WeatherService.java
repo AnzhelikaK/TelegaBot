@@ -1,3 +1,7 @@
+package Service;
+
+import DAO.WeatherDAO;
+import DAO.WeatherModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -10,23 +14,22 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 
-public class Weather {
-    private Model model;
+public class WeatherService {
+    private String nameOfCity;
     private Supplier<LocalDate> s = LocalDate::now;  // ради использование функционального интерфейса
     private LocalDate date = s.get();
     private Date dateForDB = Date.valueOf(date);
+    WeatherModel model;
 
-
-    public Weather(String nameOfCity) {
-        this.model = new Model();
-        model.setNameOfCity(nameOfCity.toLowerCase());
+    public WeatherService(String nameOfCity) {
+        this.nameOfCity = nameOfCity;
     }
 
     public String getWeather() throws IOException {
 
-        if (!checkDateInDB(model, dateForDB)) {
-            System.out.println("зашли получать ответ с сайта для " + model.getNameOfCity());
-            URL url = new URL("http://api.openweathermap.org/data/2.5/weather?q=" + model.getNameOfCity() + "&units=metric&appid=fe982945678dccb35c624850b3029e0f");
+        if (!checkDB()) {
+            System.out.println("зашли получать ответ с сайта для " + nameOfCity);
+            URL url = new URL("http://api.openweathermap.org/data/2.5/weather?q=" + nameOfCity + "&units=metric&appid=fe982945678dccb35c624850b3029e0f");
 
             // вариант 1 получения json в виде String
             Reader reader = new InputStreamReader((InputStream) url.getContent());
@@ -43,24 +46,28 @@ public class Weather {
         while (in.hasNext()) result += in.nextLine();
 */
             workWithJson(result.toString());
-            writeDateInDB();
-        } else System.out.println("Ответ был из БД получен для " + model.getNameOfCity());
-        return "City: " + model.getNameOfCity() + "\n"
+
+        } else System.out.println("Ответ был из БД получен для " + nameOfCity);
+        return "City: " + model.getName() + "\n"
+                + "Date: " + model.getDate() + "\n"
                 + "Temperature: " + model.getTemp() + " C" + '\u00B0' + "\n" +
                 "Humidity: " + model.getHumidity() + " %" + "\n" + "Description: " + model.getDescription() + "\n" +
                 "http://openweathermap.org/img/wn/" + model.getIcon() + "@2x.png";
     }
 
 
-    private boolean checkDateInDB(Model model, Date dateForDB) {
-        DataBase db = new DataBase();
-        db.getConnectDB();
-        return db.answerOfDB(model, dateForDB);
+    private boolean checkDB() {
+        WeatherDAO weatherDAO = new WeatherDAO();    // ? нужно ли создавать тут этот объект или может сделать его методы статичные
+        model = weatherDAO.getCityByDate(dateForDB, nameOfCity);
+        if (model.getName() != null) {
+            return true;
+        } else return false;
     }
 
     private void workWithJson(String result) {
         JSONObject object = new JSONObject(result);               // создали json объект из всей строчки
-        //    model.setNameOfCity(object.getString("name"));      // уже установили взяб из текстового сообщения
+        model.setName(object.getString("name"));      // уже установили взяб из текстового сообщения
+        model.setDate(dateForDB);
         JSONObject main = object.getJSONObject("main");           // берем из всего JSON маленький объект main  {}, так как в нем находятся значения температуры и влажности
         model.setTemp(main.getDouble("temp"));
         model.setHumidity(main.getDouble("humidity"));
@@ -70,13 +77,11 @@ public class Weather {
             model.setIcon((String) obj.get("icon"));
             model.setDescription((String) obj.get("main"));
         }
+
+        // write weatherModel into DB
+        WeatherDAO weatherDAO = new WeatherDAO();
+        weatherDAO.add(model);
     }
 
-    private void writeDateInDB() {
-        DataBase db = new DataBase();
-        db.getConnectDB();
-        db.writeInDB(model, dateForDB);
-        db.closeDB();
-    }
 
 }
